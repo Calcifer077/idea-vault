@@ -112,7 +112,10 @@
    BASE STYLES
    ========================= */
 @layer base {
-  * {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
     @apply border-border outline-ring/50;
   }
 
@@ -124,7 +127,6 @@
     @apply bg-background text-foreground font-sans antialiased;
   }
 }
-
 /* =========================
    UTILITIES
    ========================= */
