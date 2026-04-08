@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ui/theme-provider";
+import { Navbar } from "@/files/Navbar";
+import Footer from "./_components/ui/Footer";
 
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",
@@ -37,14 +39,17 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${inter.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="h-screen w-screen flex flex-col bg-background text-foreground transition-colors ">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
+          <Navbar />
           {children}
+          <div className="flex-1" /> {/* pushes footer down */}
+          <Footer />
         </ThemeProvider>
       </body>
     </html>
