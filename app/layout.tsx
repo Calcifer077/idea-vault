@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ui/theme-provider";
-import { Navbar } from "@/files/Navbar";
+import { Navbar } from "./_components/ui/Navbar";
 import Footer from "./_components/ui/Footer";
 
 // const geistSans = Geist({
