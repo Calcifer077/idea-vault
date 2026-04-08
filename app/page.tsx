@@ -6,8 +6,8 @@ import InputBox from "./_components/index/InputBox";
 
 export default function Home() {
   return (
-    <div className="overflow-x-hidden w-full h-full">
-      <hr className="-mx-8 border-border" />
+    <div className="w-full h-full">
+      <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] border-t border-border" />
       {/* Hero */}
       <section className="py-18 text-center">
         <div className="container mx-auto">
@@ -22,7 +22,7 @@ export default function Home() {
         </div>
       </section>
       <InputBox />
-      <p className="pt-4 text-xs text-center">
+      <p className="pt-4 text-xs text-center mb-10">
         Press <Kbd>Ctrl</Kbd> + <Kbd>Enter</Kbd> to save
       </p>
     </div>
