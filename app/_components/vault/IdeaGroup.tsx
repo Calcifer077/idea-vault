@@ -1,11 +1,18 @@
+"use client";
+
+import { useState } from "react";
+
 import { Idea } from "@/app/_lib/types";
 import IdeaCard from "./IdeaCard";
+import IdeaModal from "./IdeaModal";
 
 interface IdeaGroupProps {
   ideas: Idea[];
 }
 
 export default function IdeaGroup({ ideas }: IdeaGroupProps) {
+  const [selectedIdea, setSelectedIdea] = useState<Idea | null>(null);
+
   return (
     <div className="w-full flex justify-center mb-8">
       {ideas.length === 0 ? (
@@ -15,9 +22,26 @@ export default function IdeaGroup({ ideas }: IdeaGroupProps) {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {ideas.map((idea, i) => (
-            <IdeaCard key={idea.id} idea={idea} index={i} />
+            <IdeaCard
+              key={idea.id}
+              idea={idea}
+              index={i}
+              onClick={setSelectedIdea}
+              onDelete={(idea: Idea) => console.log("hll")}
+            />
           ))}
         </div>
+      )}
+
+      {selectedIdea && (
+        <IdeaModal
+          idea={selectedIdea}
+          onClose={() => setSelectedIdea(null)}
+          onSave={(updated: Idea) => {
+            console.log("Updated idea " + updated);
+            setSelectedIdea(null);
+          }}
+        />
       )}
     </div>
   );

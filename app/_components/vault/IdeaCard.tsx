@@ -1,10 +1,12 @@
 import { Idea } from "@/app/_lib/types";
 import { Badge } from "@/components/ui/badge";
-import { Cloud, CloudOff, Loader2 } from "lucide-react";
+import { Cloud, CloudOff, Loader2, Trash2 } from "lucide-react";
 
 interface IdeaCardProps {
   idea: Idea;
   index: number;
+  onClick?: (idea: Idea) => void;
+  onDelete: (idea: Idea) => void;
 }
 
 const syncIcons = {
@@ -13,9 +15,12 @@ const syncIcons = {
   local: <CloudOff className="w-3.5 h-3.5 text-muted-foreground" />,
 };
 
-export default function IdeaCard({ idea, index }: IdeaCardProps) {
+export default function IdeaCard({ idea, onClick, onDelete }: IdeaCardProps) {
   return (
-    <div className="flex flex-col border max-w-95 p-6 rounded-xl">
+    <div
+      className="group relative flex flex-col border max-w-95 p-6 rounded-xl"
+      onClick={() => onClick?.(idea)}
+    >
       <div className="flex items-start justify-between gap-2 mb-2">
         <div className="font-semibold text-sm text-foreground line-clamp-1">
           {idea.title}
@@ -61,6 +66,17 @@ export default function IdeaCard({ idea, index }: IdeaCardProps) {
           day: "numeric",
         })}
       </p>
+
+      <button
+        onClick={(e) => {
+          // To stop the modal from opening
+          e.stopPropagation();
+          onDelete(idea);
+        }}
+        className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-md hover:bg-destructive/10"
+      >
+        <Trash2 className="w-3.5 h-3.5 text-destructive" />
+      </button>
     </div>
   );
 }
