@@ -1,6 +1,6 @@
 "use server";
 
-import { getFileContent, updateFile } from "../../lib/github";
+import { getFileContent, updateFile } from "./github";
 
 export async function fetchIdeas() {
   const { content } = await getFileContent();
