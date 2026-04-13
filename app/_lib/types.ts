@@ -1,4 +1,4 @@
-export interface Idea {
+export type Idea = {
   id: string;
   title: string;
   description: string;
@@ -7,4 +7,11 @@ export interface Idea {
   techStack: string[];
   syncStatus: "synced" | "pending" | "local";
   createdAt: string;
-}
+};
+
+export type Project = {
+  name: string;
+  points: string[];
+  tags: string[];
+  techStack: string[];
+};
