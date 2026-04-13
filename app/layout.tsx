@@ -35,11 +35,13 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      // Add this line right here!
       suppressHydrationWarning
       className={`${inter.variable} h-full antialiased`}
     >
-      <body className="h-screen w-screen flex flex-col bg-background text-foreground transition-colors ">
+      <body
+        suppressHydrationWarning
+        className="h-screen w-screen flex flex-col bg-background text-foreground transition-colors"
+      >
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
