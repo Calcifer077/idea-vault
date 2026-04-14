@@ -1,9 +1,8 @@
 "use client";
 
-import { Search } from "lucide-react";
-import { useState } from "react";
 import IdeaGroup from "../_components/vault/IdeaGroup";
 import { Idea } from "../_lib/types";
+import { useIdeas } from "../_components/IdeasContext";
 
 export const ideas: Idea[] = [
   {
@@ -63,7 +62,7 @@ export const ideas: Idea[] = [
 ];
 
 export default function Page() {
-  const [search, setSearch] = useState("");
+  const { state } = useIdeas();
 
   return (
     <div className="w-full h-full px-16 overflow-x-hidden">
@@ -76,18 +75,10 @@ export default function Page() {
           </h1>
           <span className="text-sm text-muted-foreground">6 ideas stored</span>
         </div>
-        <div className="relative w-full sm:w-64 flex items-center">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search ideas or tags…"
-            className="w-full pl-9 pr-3 py-2 text-sm bg-secondary/50 rounded-lg outline-none focus:ring-1 focus:ring-ring text-foreground placeholder:text-muted-foreground"
-          />
-        </div>
+        <div className="relative w-full sm:w-64 flex items-center"></div>
       </div>
 
-      <IdeaGroup ideas={ideas} />
+      <IdeaGroup ideas={state} />
     </div>
   );
 }
