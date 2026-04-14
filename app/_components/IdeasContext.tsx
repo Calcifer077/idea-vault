@@ -1,3 +1,5 @@
+"use client";
+
 import { createContext, useContext, useReducer, ReactNode } from "react";
 import { Idea } from "../_lib/types";
 
@@ -5,7 +7,8 @@ import { Idea } from "../_lib/types";
 type Action =
   | { type: "add"; payload: Idea }
   | { type: "remove"; payload: string }
-  | { type: "update"; payload: { updatedIdea: Idea; id: string } };
+  | { type: "update"; payload: { updatedIdea: Idea; id: string } }
+  | { type: "set"; payload: Idea[] };
 
 // 2. Define context type
 type IdeasContextType = {
@@ -13,8 +16,7 @@ type IdeasContextType = {
   dispatch: React.Dispatch<Action>;
 };
 
-// 3. Initial state
-const initialState: Idea[] = [];
+// 3. Initial state (present in context)
 
 // 4. Create context
 const IdeasContext = createContext<IdeasContextType | undefined>(undefined);
@@ -22,6 +24,9 @@ const IdeasContext = createContext<IdeasContextType | undefined>(undefined);
 // 5. Reducer
 function reducer(state: Idea[], action: Action): Idea[] {
   switch (action.type) {
+    case "set":
+      return action.payload;
+
     case "add":
       return [...state, { ...action.payload, syncStatus: "pending" }];
 
@@ -48,8 +53,14 @@ function reducer(state: Idea[], action: Action): Idea[] {
 }
 
 // 6. Provider
-function IdeasContextProvider({ children }: { children: ReactNode }) {
-  const [state, dispatch] = useReducer(reducer, initialState);
+function IdeasContextProvider({
+  children,
+  initialIdeas,
+}: {
+  children: ReactNode;
+  initialIdeas: Idea[];
+}) {
+  const [state, dispatch] = useReducer(reducer, initialIdeas);
 
   return (
     <IdeasContext.Provider value={{ state, dispatch }}>
