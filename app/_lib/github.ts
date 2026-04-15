@@ -25,8 +25,10 @@ export async function getFileContent() {
 export async function updateFile(
   newContent: string,
   sha: string,
-  message = "Update via Next.js app",
+  message?: string,
 ) {
+  const finalMessage = message || `Update via Next.js app - ${Date.now()}`;
+
   const encodedContent = Buffer.from(newContent).toString("base64");
 
   const res = await fetch(
@@ -38,7 +40,7 @@ export async function updateFile(
         Accept: "application/vnd.github.v3+json",
       },
       body: JSON.stringify({
-        message,
+        message: finalMessage,
         content: encodedContent,
         sha, // required for updates
         branch: process.env.GITHUB_BRANCH,

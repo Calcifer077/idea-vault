@@ -28,7 +28,7 @@ function reducer(state: Idea[], action: Action): Idea[] {
       return action.payload;
 
     case "add":
-      return [...state, { ...action.payload, syncStatus: "pending" }];
+      return [...state, { ...action.payload, syncStatus: "synced" }];
 
     case "remove":
       return state.filter((idea) => idea.id !== action.payload);
