@@ -1,6 +1,6 @@
 "use server";
 
-import { getFileContent, updateFile as updateFileApi } from "./github";
+import { getFileContent, updateFile } from "./github";
 
 export async function fetchIdeas() {
   const { content } = await getFileContent();
@@ -8,13 +8,10 @@ export async function fetchIdeas() {
   return content;
 }
 
-export async function updateFile(newData: string) {
+export async function updateConfig(newData: unknown) {
   const { sha } = await getFileContent();
-  const newContent = newData;
-
-  // console.log(newContent);
-
-  await updateFileApi(newContent, sha);
+  const newContent = JSON.stringify(newData, null, 2);
+  await updateFile(newContent, sha, "Updated ideas from app");
 
   return { success: true };
 }
