@@ -27,7 +27,6 @@ export default function IdeaGroup({ ideas }: IdeaGroupProps) {
               idea={idea}
               index={i}
               onClick={setSelectedIdea}
-              onDelete={(idea: Idea) => console.log("hll")}
             />
           ))}
         </div>

@@ -1,12 +1,25 @@
 import { Idea } from "@/app/_lib/types";
 import { Badge } from "@/components/ui/badge";
 import { Cloud, CloudOff, Loader2, Trash2 } from "lucide-react";
+import { useIdeas } from "../IdeasContext";
+import { toast } from "sonner";
+import { ideasToMarkdown } from "@/app/_lib/ideasToMarkdown";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface IdeaCardProps {
   idea: Idea;
   index: number;
   onClick?: (idea: Idea) => void;
-  onDelete: (idea: Idea) => void;
 }
 
 const syncIcons = {
@@ -15,7 +28,39 @@ const syncIcons = {
   local: <CloudOff className="w-3.5 h-3.5 text-muted-foreground" />,
 };
 
-export default function IdeaCard({ idea, onClick, onDelete }: IdeaCardProps) {
+export default function IdeaCard({ idea, onClick }: IdeaCardProps) {
+  const { state, dispatch } = useIdeas();
+
+  async function handleDelete() {
+    const toastId = "delete-idea";
+
+    toast.loading("Deleting...", { id: toastId, position: "top-center" });
+
+    const updatedState = state.filter((i) => i.id !== idea.id);
+
+    dispatch({
+      type: "remove",
+      payload: idea.id,
+    });
+
+    const ideasString = ideasToMarkdown(updatedState);
+
+    toast.loading("Deleting idea...", { id: toastId, position: "top-center" });
+
+    await fetch("/api/github/updateFile", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ markdown: ideasString }),
+    });
+
+    toast.success("Idea deleted successfully", {
+      id: toastId,
+      position: "top-center",
+    });
+  }
+
   return (
     <div
       className="group relative flex flex-col border max-w-95 p-6 rounded-xl"
@@ -67,16 +112,36 @@ export default function IdeaCard({ idea, onClick, onDelete }: IdeaCardProps) {
         })}
       </p>
 
-      <button
-        onClick={(e) => {
-          // To stop the modal from opening
-          e.stopPropagation();
-          onDelete(idea);
-        }}
-        className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-md hover:bg-destructive/10"
-      >
-        <Trash2 className="w-3.5 h-3.5 text-destructive" />
-      </button>
+      <AlertDialog>
+        <AlertDialogTrigger asChild>
+          <button
+            onClick={(e) => {
+              // To stop the modal from opening
+              e.stopPropagation();
+            }}
+            className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-md hover:bg-destructive/10"
+          >
+            <Trash2 className="w-3.5 h-3.5 text-destructive" />
+          </button>
+        </AlertDialogTrigger>
+        <AlertDialogContent
+          // To stop event from propogating.
+          onClick={(e) => e.stopPropagation()}
+        >
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete your idea.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete}>
+              Continue
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
