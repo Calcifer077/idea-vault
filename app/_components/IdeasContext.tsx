@@ -7,7 +7,16 @@ import { Idea } from "../_lib/types";
 type Action =
   | { type: "add"; payload: Idea }
   | { type: "remove"; payload: string }
-  | { type: "update"; payload: { updatedIdea: Idea; id: string } }
+  | {
+      type: "update";
+      payload: {
+        id: string;
+        title: string;
+        description: string;
+        tags: string[];
+        techStack: string[];
+      };
+    }
   | { type: "set"; payload: Idea[] };
 
 // 2. Define context type
@@ -34,11 +43,12 @@ function reducer(state: Idea[], action: Action): Idea[] {
       return state.filter((idea) => idea.id !== action.payload);
 
     case "update":
-      const { updatedIdea, id } = action.payload;
+      const { id, title, description, tags, techStack } = action.payload;
       const newState: Idea[] = [];
 
       for (const idea of state) {
         if (idea.id === id) {
+          const updatedIdea = { title, description, tags, techStack };
           newState.push({ ...idea, ...updatedIdea, syncStatus: "pending" });
         } else {
           newState.push({ ...idea });

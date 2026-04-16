@@ -11,18 +11,22 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-
-import { Idea } from "@/app/_lib/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+
+import { Idea } from "@/app/_lib/types";
+import { useIdeas } from "../IdeasContext";
+import { ideasToMarkdown } from "@/app/_lib/ideasToMarkdown";
 
 interface IdeaModalProps {
   idea: Idea;
   onClose: () => void;
-  onSave: (idea: Idea) => void;
 }
 
-export default function IdeaModal({ idea, onClose, onSave }: IdeaModalProps) {
+export default function IdeaModal({ idea, onClose }: IdeaModalProps) {
+  const { state, dispatch } = useIdeas();
+
   const [title, setTitle] = useState<string>(idea.title);
   const [description, setDescription] = useState<string>(idea.description);
 
@@ -57,14 +61,66 @@ export default function IdeaModal({ idea, onClose, onSave }: IdeaModalProps) {
     setTechStack([...techStack.slice(0, idx), ...techStack.slice(idx + 1)]);
   }
 
-  function handleSave() {
-    onSave({
-      ...idea,
-      title,
-      description,
-      tags,
-      techStack,
+  async function handleSave() {
+    console.log(idea.id);
+
+    const toastId = "update-idea";
+
+    toast.loading("Working...", { id: toastId, position: "top-center" });
+
+    if (
+      !title.length ||
+      !description.length ||
+      !tags.length ||
+      !techStack.length
+    ) {
+      toast.error("Kindly fill all the fields", {
+        id: toastId,
+        position: "top-center",
+      });
+      return;
+    }
+
+    const updatedIdeas: Idea[] = [];
+
+    for (const oldIdea of state) {
+      if (oldIdea.id === idea.id) {
+        const updatedIdea = { title, description, tags, techStack };
+        updatedIdeas.push({ ...idea, ...updatedIdea, syncStatus: "pending" });
+      } else {
+        updatedIdeas.push({ ...oldIdea });
+      }
+    }
+
+    dispatch({
+      type: "update",
+      payload: {
+        id: idea.id,
+        title,
+        description,
+        tags,
+        techStack,
+      },
     });
+
+    const ideasString = ideasToMarkdown(updatedIdeas);
+
+    toast.loading("Saving idea...", { id: toastId, position: "top-center" });
+
+    await fetch("/api/github/updateFile", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ markdown: ideasString }),
+    });
+
+    toast.success("Idea updated successfully", {
+      id: toastId,
+      position: "top-center",
+    });
+
+    onClose();
   }
 
   return (

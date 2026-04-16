@@ -34,14 +34,7 @@ export default function IdeaGroup({ ideas }: IdeaGroupProps) {
       )}
 
       {selectedIdea && (
-        <IdeaModal
-          idea={selectedIdea}
-          onClose={() => setSelectedIdea(null)}
-          onSave={(updated: Idea) => {
-            console.log("Updated idea " + updated);
-            setSelectedIdea(null);
-          }}
-        />
+        <IdeaModal idea={selectedIdea} onClose={() => setSelectedIdea(null)} />
       )}
     </div>
   );
