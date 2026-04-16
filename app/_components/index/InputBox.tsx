@@ -21,7 +21,13 @@ export default function InputBox() {
   const [error, setError] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  async function saveIdeaToStorage() {
+  async function handleSave() {
+    const toastId = "save-idea";
+
+    setIsSaving(true);
+
+    toast.loading("Working...", { id: toastId, position: "top-center" });
+
     const titleToUpload = idea.split(/\r?\n/)[0];
     const descriptionToUpload = idea.split(/\r?\n/).slice(1).join("\n").trim();
 
@@ -42,7 +48,14 @@ export default function InputBox() {
       !techStackToUpload.length
     ) {
       setError(true);
-      toast.error("Kindly fill all the fields", { position: "top-center" });
+
+      toast.error("Kindly fill all the fields", {
+        id: toastId,
+        position: "top-center",
+      });
+
+      setIsSaving(false);
+
       return;
     }
 
@@ -67,13 +80,24 @@ export default function InputBox() {
       Return ONLY the summary text.
     `;
 
+    toast.loading("Generating summary...", {
+      id: toastId,
+      position: "top-center",
+    });
+
     const res = await fetch("/api/gemini", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ prompt }),
     });
 
-    if (!res.ok) throw new Error("Failed to generate summary");
+    if (!res.ok) {
+      toast.error("Failed to generate summary", {
+        id: toastId,
+        position: "top-center",
+      });
+      return;
+    }
 
     const summaryData = await res.json();
     const summaryToUpload =
@@ -99,6 +123,8 @@ export default function InputBox() {
 
     const ideasString = ideasToMarkdown(updatedIdeas);
 
+    toast.loading("Saving idea...", { id: toastId, position: "top-center" });
+
     await fetch("/api/github/updateFile", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -107,35 +133,14 @@ export default function InputBox() {
 
     resetState();
 
+    setIsSaving(false);
+
+    toast.success("Idea saved successfully", {
+      id: toastId,
+      position: "top-center",
+    });
+
     return "success";
-  }
-
-  async function handleSave() {
-    if (isSaving) return;
-
-    setIsSaving(true);
-
-    try {
-      toast.promise(saveIdeaToStorage(), {
-        loading: "Saving idea and syncing to GitHub...",
-        success: "Idea saved successfully & synced to GitHub!",
-        error: (err) => {
-          if (err.message === "Kindly fill all the fields") {
-            setError(true);
-            return "Please fill all the fields";
-          } else if (err.message === "Failed to generate summary") {
-            return "Failed to generate summary, problem with gemini api. Try again";
-          }
-          return "Something went wrong, please try again. Check logs for more details";
-        },
-        position: "top-center",
-      });
-    } catch (error) {
-      // This block is rarely needed but safe
-      console.error(error);
-    } finally {
-      setIsSaving(false);
-    }
   }
 
   function resetState() {
@@ -143,6 +148,16 @@ export default function InputBox() {
     setTags("");
     setTechStack("");
   }
+
+  // function handleToast(state: string, message: string) {
+  //   if (state === "Error") {
+  //     toast.error(message, { position: "top-left" });
+  //   } else if (state === "Success") {
+  //     toast.success(message, { position: "top-left" });
+  //   } else if (state === "Loading") {
+  //     toast.loading(message, { position: "top-left" });
+  //   }
+  // }
 
   return (
     <div
@@ -229,7 +244,7 @@ export default function InputBox() {
             disabled={isSaving}
           >
             <Send size={16} />
-            Save
+            {isSaving ? "Saving..." : "Save"}
           </Button>
         </div>
       </div>

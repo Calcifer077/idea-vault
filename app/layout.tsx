@@ -6,6 +6,7 @@ import { Navbar } from "./_components/ui/Navbar";
 import Footer from "./_components/ui/Footer";
 import { IdeasContextProvider } from "./_components/IdeasContext";
 import { convertMarkdown } from "./_lib/convertMarkdown";
+import { Toaster } from "sonner";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -44,6 +45,7 @@ export default async function RootLayout({
           <Navbar />
           <IdeasContextProvider initialIdeas={ideas}>
             {children}
+            <Toaster />
           </IdeasContextProvider>
           <div className="flex-1" /> {/* pushes footer down */}
           <Footer />
