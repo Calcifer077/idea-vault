@@ -18,6 +18,7 @@ import { toast } from "sonner";
 import { Idea } from "@/app/_lib/types";
 import { useIdeas } from "../IdeasContext";
 import { ideasToMarkdown } from "@/app/_lib/ideasToMarkdown";
+import { updateGithubFile } from "@/app/_lib/updateGithubFile";
 
 interface IdeaModalProps {
   idea: Idea;
@@ -62,8 +63,6 @@ export default function IdeaModal({ idea, onClose }: IdeaModalProps) {
   }
 
   async function handleSave() {
-    console.log(idea.id);
-
     const toastId = "update-idea";
 
     toast.loading("Working...", { id: toastId, position: "top-center" });
@@ -81,46 +80,50 @@ export default function IdeaModal({ idea, onClose }: IdeaModalProps) {
       return;
     }
 
-    const updatedIdeas: Idea[] = [];
+    try {
+      const updatedIdeas: Idea[] = [];
 
-    for (const oldIdea of state) {
-      if (oldIdea.id === idea.id) {
-        const updatedIdea = { title, description, tags, techStack };
-        updatedIdeas.push({ ...idea, ...updatedIdea, syncStatus: "pending" });
-      } else {
-        updatedIdeas.push({ ...oldIdea });
+      for (const oldIdea of state) {
+        if (oldIdea.id === idea.id) {
+          const updatedIdea = { title, description, tags, techStack };
+          updatedIdeas.push({ ...idea, ...updatedIdea, syncStatus: "pending" });
+        } else {
+          updatedIdeas.push({ ...oldIdea });
+        }
       }
+
+      dispatch({
+        type: "update",
+        payload: {
+          id: idea.id,
+          title,
+          description,
+          tags,
+          techStack,
+        },
+      });
+
+      toast.loading("Saving idea...", { id: toastId, position: "top-center" });
+
+      const ideasString = ideasToMarkdown(updatedIdeas);
+
+      await updateGithubFile(ideasString);
+
+      toast.success("Idea updated successfully", {
+        id: toastId,
+        position: "top-center",
+      });
+
+      onClose();
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Failed to update idea",
+        {
+          id: toastId,
+          position: "top-center",
+        },
+      );
     }
-
-    dispatch({
-      type: "update",
-      payload: {
-        id: idea.id,
-        title,
-        description,
-        tags,
-        techStack,
-      },
-    });
-
-    const ideasString = ideasToMarkdown(updatedIdeas);
-
-    toast.loading("Saving idea...", { id: toastId, position: "top-center" });
-
-    await fetch("/api/github/updateFile", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ markdown: ideasString }),
-    });
-
-    toast.success("Idea updated successfully", {
-      id: toastId,
-      position: "top-center",
-    });
-
-    onClose();
   }
 
   return (

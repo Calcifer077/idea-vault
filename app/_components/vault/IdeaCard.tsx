@@ -15,6 +15,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { updateGithubFile } from "@/app/_lib/updateGithubFile";
 
 interface IdeaCardProps {
   idea: Idea;
@@ -36,29 +37,36 @@ export default function IdeaCard({ idea, onClick }: IdeaCardProps) {
 
     toast.loading("Deleting...", { id: toastId, position: "top-center" });
 
-    const updatedState = state.filter((i) => i.id !== idea.id);
+    try {
+      const updatedState = state.filter((i) => i.id !== idea.id);
 
-    dispatch({
-      type: "remove",
-      payload: idea.id,
-    });
+      dispatch({
+        type: "remove",
+        payload: idea.id,
+      });
 
-    const ideasString = ideasToMarkdown(updatedState);
+      toast.loading("Deleting idea...", {
+        id: toastId,
+        position: "top-center",
+      });
 
-    toast.loading("Deleting idea...", { id: toastId, position: "top-center" });
+      const ideasString = ideasToMarkdown(updatedState);
 
-    await fetch("/api/github/updateFile", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ markdown: ideasString }),
-    });
+      await updateGithubFile(ideasString);
 
-    toast.success("Idea deleted successfully", {
-      id: toastId,
-      position: "top-center",
-    });
+      toast.success("Idea deleted successfully", {
+        id: toastId,
+        position: "top-center",
+      });
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Failed to delete idea",
+        {
+          id: toastId,
+          position: "top-center",
+        },
+      );
+    }
   }
 
   return (

@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { ideasToMarkdown } from "@/app/_lib/ideasToMarkdown";
+import { generateSummary } from "@/app/_lib/generateSummary";
+import { updateGithubFile } from "@/app/_lib/updateGithubFile";
 
 export default function InputBox() {
   const { state, dispatch } = useIdeas();
@@ -59,7 +61,8 @@ export default function InputBox() {
       return;
     }
 
-    const prompt = `
+    try {
+      const prompt = `
       You are an assistant that writes concise, high-quality summaries.
 
       Given the following idea details:
@@ -80,69 +83,55 @@ export default function InputBox() {
       Return ONLY the summary text.
     `;
 
-    toast.loading("Generating summary...", {
-      id: toastId,
-      position: "top-center",
-    });
-
-    const res = await fetch("/api/gemini", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt }),
-    });
-
-    if (!res.ok) {
-      toast.error("Failed to generate summary", {
+      toast.loading("Generating summary...", {
         id: toastId,
         position: "top-center",
       });
 
+      const summaryToUpload = await generateSummary(prompt);
+
+      const newIdea: Idea = {
+        id: crypto.randomUUID().toString(),
+        title: titleToUpload,
+        description: descriptionToUpload,
+        summary: summaryToUpload,
+        tags: tagsToUpload,
+        techStack: techStackToUpload,
+        syncStatus: "synced",
+        createdAt: new Date().toISOString(),
+      };
+
+      const updatedIdeas = [...state, newIdea];
+
+      dispatch({
+        type: "add",
+        payload: newIdea,
+      });
+
+      const ideasString = ideasToMarkdown(updatedIdeas);
+
+      toast.loading("Saving idea...", { id: toastId, position: "top-center" });
+
+      await updateGithubFile(ideasString);
+
+      resetState();
+
       setIsSaving(false);
-      return;
+
+      toast.success("Idea saved successfully", {
+        id: toastId,
+        position: "top-center",
+      });
+
+      return "success";
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Something went wrong", {
+        id: toastId,
+        position: "top-center",
+      });
+    } finally {
+      setIsSaving(false);
     }
-
-    const summaryData = await res.json();
-    const summaryToUpload =
-      summaryData.summary || summaryData.text || summaryData;
-
-    const newIdea: Idea = {
-      id: crypto.randomUUID().toString(),
-      title: titleToUpload,
-      description: descriptionToUpload,
-      summary: summaryToUpload,
-      tags: tagsToUpload,
-      techStack: techStackToUpload,
-      syncStatus: "synced",
-      createdAt: new Date().toISOString(),
-    };
-
-    const updatedIdeas = [...state, newIdea];
-
-    dispatch({
-      type: "add",
-      payload: newIdea,
-    });
-
-    const ideasString = ideasToMarkdown(updatedIdeas);
-
-    toast.loading("Saving idea...", { id: toastId, position: "top-center" });
-
-    await fetch("/api/github/updateFile", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ markdown: ideasString }),
-    });
-
-    resetState();
-
-    setIsSaving(false);
-
-    toast.success("Idea saved successfully", {
-      id: toastId,
-      position: "top-center",
-    });
-
-    return "success";
   }
 
   function resetState() {
