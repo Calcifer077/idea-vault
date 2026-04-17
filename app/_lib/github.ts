@@ -27,7 +27,8 @@ export async function updateFile(
   sha: string,
   message?: string,
 ) {
-  const finalMessage = message || `Update via Next.js app - ${Date.now()}`;
+  const readableDate = new Date(Date.now()).toISOString().replace('T', ' ').slice(0, 19);
+  const finalMessage = message || `Update via Next.js app - ${readableDate}`;
 
   const encodedContent = Buffer.from(newContent).toString("base64");
 
