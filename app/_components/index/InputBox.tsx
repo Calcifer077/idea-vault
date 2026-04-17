@@ -96,6 +96,8 @@ export default function InputBox() {
         id: toastId,
         position: "top-center",
       });
+
+      setIsSaving(false);
       return;
     }
 
