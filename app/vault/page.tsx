@@ -8,7 +8,7 @@ export default function Page() {
   const { state } = useIdeas();
 
   return (
-    <div className="w-full min-h-screen px-6 sm:px-8 lg:px-10 overflow-x-hidden">
+    <div className="w-full min-h-screen px-6 sm:px-8 lg:px-10">
       {/* Top border */}
       <div className="w-full border-t border-border" />
 

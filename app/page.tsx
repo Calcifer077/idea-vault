@@ -5,7 +5,7 @@ import InputBox from "./_components/index/InputBox";
 
 export default function Home() {
   return (
-    <div className="w-full min-h-screen overflow-x-hidden">
+    <div className="w-full min-h-screen">
       {/* Top border */}
       <div className="w-full border-t border-border" />
 

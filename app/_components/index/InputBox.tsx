@@ -140,16 +140,6 @@ export default function InputBox() {
     setTechStack("");
   }
 
-  // function handleToast(state: string, message: string) {
-  //   if (state === "Error") {
-  //     toast.error(message, { position: "top-left" });
-  //   } else if (state === "Success") {
-  //     toast.success(message, { position: "top-left" });
-  //   } else if (state === "Loading") {
-  //     toast.loading(message, { position: "top-left" });
-  //   }
-  // }
-
   return (
     <div
       className={`
@@ -168,7 +158,7 @@ export default function InputBox() {
       <div className="p-3 sm:p-4">
         <textarea
           placeholder="Type your idea... (First line will be title)"
-          className="w-full min-h-[120px] sm:min-h-[140px] bg-transparent border-none focus:ring-0 outline-none resize-none text-sm sm:text-base placeholder:text-muted-foreground"
+          className="w-full min-h-30 sm:min-h-35 bg-transparent border-none focus:ring-0 outline-none resize-none text-sm sm:text-base placeholder:text-muted-foreground"
           value={idea}
           onChange={(e) => {
             setIdea(e.target.value);
