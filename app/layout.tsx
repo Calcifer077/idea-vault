@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/components/ui/theme-provider";
 import { Navbar } from "./_components/ui/Navbar";
 import Footer from "./_components/ui/Footer";
 import { IdeasContextProvider } from "./_components/IdeasContext";
@@ -36,12 +35,6 @@ export default async function RootLayout({
         suppressHydrationWarning
         className="h-screen w-screen flex flex-col bg-background text-foreground transition-colors"
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
           <Navbar />
           <IdeasContextProvider initialIdeas={ideas}>
             {children}
@@ -49,7 +42,6 @@ export default async function RootLayout({
           </IdeasContextProvider>
           <div className="flex-1" /> {/* pushes footer down */}
           <Footer />
-        </ThemeProvider>
       </body>
     </html>
   );

@@ -4,10 +4,10 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { Lightbulb, Moon, Sun, Archive } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useTheme } from "next-themes";
+import {useTheme} from "@/app/hooks/useTheme";
 
 export function Navbar() {
-  const { theme, setTheme } = useTheme();
+  const {dark, toggle} = useTheme();
   const pathname = usePathname();
 
   return (
@@ -42,23 +42,23 @@ export function Navbar() {
           </Button>
         </Link>
 
-        {theme === "light" && (
+        {!dark && (
           <Button
             variant="ghost"
             size="icon"
             className="w-8 h-8 ml-2 cursor-pointer"
-            onClick={() => setTheme("dark")}
+            onClick={toggle}
           >
             <Moon className="w-4 h-4" />
           </Button>
         )}
 
-        {theme === "dark" && (
+        {dark&& (
           <Button
             variant="ghost"
             size="icon"
             className="w-8 h-8 ml-2 cursor-pointer"
-            onClick={() => setTheme("light")}
+            onClick={toggle}
           >
             <Sun className="w-4 h-4" />
           </Button>
