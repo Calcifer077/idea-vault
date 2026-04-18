@@ -128,95 +128,102 @@ export default function IdeaModal({ idea, onClose }: IdeaModalProps) {
 
   return (
     <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg max-h-[90vh] p-6 roudned-2xl overflow-y-scroll">
-        <DialogHeader>
+      <DialogContent className="w-[95%] sm:max-w-lg max-h-[90vh] p-4 sm:p-6 rounded-2xl overflow-y-auto">
+        <DialogHeader className="space-y-1">
           <DialogTitle>Edit Idea</DialogTitle>
           <DialogDescription>
-            Make changes to your idea here, Click save when you are done.
+            Make changes to your idea here. Click save when done.
           </DialogDescription>
         </DialogHeader>
 
-        {/* Title */}
-        <Input
-          className="border p-2 rounded w-full"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
+        <div className="space-y-4">
+          {/* Title */}
+          <Input value={title} onChange={(e) => setTitle(e.target.value)} />
 
-        <Textarea
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
+          {/* Description */}
+          <Textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className="min-h-25"
+          />
 
-        {/* TAGS */}
-        <div>
-          <p className="text-sm font-medium mb-2">Tags</p>
-        </div>
-        {tags.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-2">
-            {tags.map((tag, i) => (
-              <Badge
-                key={i}
-                variant="secondary"
-                className="flex items-center gap-1"
-              >
-                {tag}
-                <span
-                  className="cursor-pointer"
-                  onClick={() => handleRemoveTag(i)}
-                >
-                  ✕
-                </span>
-              </Badge>
-            ))}
+          {/* TAGS */}
+          <div>
+            <p className="text-sm font-medium mb-2">Tags</p>
+
+            {tags.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-2">
+                {tags.map((tag, i) => (
+                  <Badge
+                    key={i}
+                    variant="secondary"
+                    className="flex items-center gap-1"
+                  >
+                    {tag}
+                    <span
+                      className="cursor-pointer"
+                      onClick={() => handleRemoveTag(i)}
+                    >
+                      ✕
+                    </span>
+                  </Badge>
+                ))}
+              </div>
+            )}
+
+            <Input
+              placeholder="Add tag + Enter"
+              value={tagInput}
+              onChange={(e) => setTagInput(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleAddTag()}
+            />
           </div>
-        )}
-        <Input
-          placeholder="Enter any new tag (Press enter to save)"
-          value={tagInput}
-          onChange={(e) => setTagInput(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleAddTag()}
-        />
 
-        {/* TECH STACK */}
-        <div>
-          <p className="text-sm font-medium mb-2">Tech Stack</p>
-        </div>
-        {techStack.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-2">
-            {techStack.map((tech, i) => (
-              <Badge
-                key={i}
-                variant="outline"
-                className="flex items-center gap-1 text-primary"
-              >
-                {tech}
-                <span
-                  className="cursor-pointer"
-                  onClick={() => handleRemoveTechStack(i)}
-                >
-                  ✕
-                </span>
-              </Badge>
-            ))}
+          {/* TECH STACK */}
+          <div>
+            <p className="text-sm font-medium mb-2">Tech Stack</p>
+
+            {techStack.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-2">
+                {techStack.map((tech, i) => (
+                  <Badge
+                    key={i}
+                    variant="outline"
+                    className="flex items-center gap-1 text-primary"
+                  >
+                    {tech}
+                    <span
+                      className="cursor-pointer"
+                      onClick={() => handleRemoveTechStack(i)}
+                    >
+                      ✕
+                    </span>
+                  </Badge>
+                ))}
+              </div>
+            )}
+
+            <Input
+              placeholder="Add tech + Enter"
+              value={techStackInput}
+              onChange={(e) => setTechStackInput(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleAddTechStack()}
+            />
           </div>
-        )}
 
-        <Input
-          placeholder="Enter any new tech stack (Press enter to save)"
-          value={techStackInput}
-          onChange={(e) => setTechStackInput(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleAddTechStack()}
-        />
+          {/* Actions */}
+          <div className="flex flex-col sm:flex-row gap-2 pt-2">
+            <DialogClose asChild>
+              <Button variant="outline" className="w-full sm:w-auto">
+                Cancel
+              </Button>
+            </DialogClose>
 
-        <DialogClose asChild>
-          <Button variant="outline" className="cursor-pointer">
-            Cancel
-          </Button>
-        </DialogClose>
-        <Button onClick={handleSave} className="cursor-pointer">
-          Save
-        </Button>
+            <Button onClick={handleSave} className="w-full sm:w-auto">
+              Save
+            </Button>
+          </div>
+        </div>
       </DialogContent>
     </Dialog>
   );

@@ -153,22 +153,22 @@ export default function InputBox() {
   return (
     <div
       className={`
-      w-2xl mx-auto rounded-xl border border-border bg-card
-      transition-all duration-300
+    w-full max-w-2xl mx-auto rounded-xl border border-border bg-card
+    transition-all duration-300
 
-      shadow-[0_0_10px_rgba(59,130,246,0.15),0_0_30px_rgba(139,92,246,0.1)]
+    shadow-[0_0_10px_rgba(59,130,246,0.15),0_0_30px_rgba(139,92,246,0.1)]
 
-      focus-within:shadow-[0_0_20px_rgba(59,130,246,0.35),0_0_50px_rgba(139,92,246,0.2)]
-      focus-within:border-blue-500
-      
-      ${error ? "shadow-[0_0_20px_rgba(239,68,68,0.35),0_0_50px_rgba(220,38,38,0.2)] border-destructive" : ""}
-      
-    `}
+    focus-within:shadow-[0_0_20px_rgba(59,130,246,0.35),0_0_50px_rgba(139,92,246,0.2)]
+    focus-within:border-blue-500
+    
+    ${error ? "shadow-[0_0_20px_rgba(239,68,68,0.35),0_0_50px_rgba(220,38,38,0.2)] border-destructive" : ""}
+  `}
     >
-      <div className="p-4">
+      {/* Textarea */}
+      <div className="p-3 sm:p-4">
         <textarea
           placeholder="Type your idea... (First line will be title)"
-          className="w-full min-h-30 bg-transparent border-none focus:ring-0 outline-none resize-none text-base placeholder:text-muted-foreground"
+          className="w-full min-h-[120px] sm:min-h-[140px] bg-transparent border-none focus:ring-0 outline-none resize-none text-sm sm:text-base placeholder:text-muted-foreground"
           value={idea}
           onChange={(e) => {
             setIdea(e.target.value);
@@ -178,39 +178,38 @@ export default function InputBox() {
         />
       </div>
 
-      <div className="flex w-full gap-3 px-4 pb-4">
-        <div className="flex-1">
-          <Input
-            placeholder="Tags (comma separated)"
-            className="bg-background/50 border-border focus-visible:ring-primary focus-visible:ring-1"
-            value={tags}
-            onChange={(e) => {
-              setTags(e.target.value);
-              setError(false);
-            }}
-            disabled={isSaving}
-          />
-        </div>
-        <div className="flex-1">
-          <Input
-            placeholder="Tech Stack (comma separated)"
-            className="bg-background/50 border-border focus-visible:ring-primary focus-visible:ring-1"
-            value={techStack}
-            onChange={(e) => {
-              setTechStack(e.target.value);
-              setError(false);
-            }}
-            disabled={isSaving}
-          />
-        </div>
+      {/* Inputs */}
+      <div className="flex flex-col sm:flex-row gap-3 px-3 sm:px-4 pb-4">
+        <Input
+          placeholder="Tags (comma separated)"
+          className="w-full bg-background/50 border-border focus-visible:ring-primary focus-visible:ring-1"
+          value={tags}
+          onChange={(e) => {
+            setTags(e.target.value);
+            setError(false);
+          }}
+          disabled={isSaving}
+        />
+
+        <Input
+          placeholder="Tech Stack (comma separated)"
+          className="w-full bg-background/50 border-border focus-visible:ring-primary focus-visible:ring-1"
+          value={techStack}
+          onChange={(e) => {
+            setTechStack(e.target.value);
+            setError(false);
+          }}
+          disabled={isSaving}
+        />
       </div>
 
       {/* Action Bar */}
-      <div className="flex justify-between items-center p-3 border-t border-border bg-muted/30 rounded-b-xl">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 p-3 border-t border-border bg-muted/30 rounded-b-xl">
+        {/* Toggle */}
         <Button
           variant="ghost"
           size="sm"
-          className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+          className="flex items-center justify-center sm:justify-start gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors w-full sm:w-auto"
           onClick={() => setMarkdownSupport(!markdownSupport)}
         >
           {markdownSupport ? (
@@ -221,16 +220,18 @@ export default function InputBox() {
           Markdown Support
         </Button>
 
-        <div className="flex gap-2">
-          {/* AI Button using Secondary/Accent logic */}
-          <Button variant="secondary" className="gap-2 shadow-sm">
+        {/* Buttons */}
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+          <Button
+            variant="secondary"
+            className="w-full sm:w-auto gap-2 shadow-sm"
+          >
             <Sparkles size={16} className="text-primary" />
             Ai Summary
           </Button>
 
-          {/* Primary Action */}
           <Button
-            className="bg-primary text-primary-foreground hover:opacity-90 gap-2 px-6"
+            className="w-full sm:w-auto bg-primary text-primary-foreground hover:opacity-90 gap-2"
             onClick={handleSave}
             disabled={isSaving}
           >

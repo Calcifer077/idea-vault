@@ -71,20 +71,52 @@ export default function IdeaCard({ idea, onClick }: IdeaCardProps) {
 
   return (
     <div
-      className="group relative flex flex-col border max-w-95 p-6 rounded-xl"
+      className="group relative flex flex-col border w-full p-4 sm:p-5 rounded-xl hover:shadow-md transition"
       onClick={() => onClick?.(idea)}
     >
+      {/* Header */}
       <div className="flex items-start justify-between gap-2 mb-2">
         <div className="font-semibold text-sm text-foreground line-clamp-1">
           {idea.title}
         </div>
-        <div>{syncIcons[idea.syncStatus]}</div>
+        <div className="flex items-center gap-2">
+          {syncIcons[idea.syncStatus]}
+
+          {/* Delete button (always visible on mobile) */}
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <button
+                onClick={(e) => e.stopPropagation()}
+                className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity p-1 rounded-md hover:bg-destructive/10"
+              >
+                <Trash2 className="w-4 h-4 text-destructive" />
+              </button>
+            </AlertDialogTrigger>
+
+            <AlertDialogContent onClick={(e) => e.stopPropagation()}>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will permanently delete your idea.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleDelete}>
+                  Continue
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
       </div>
 
-      <p className="text-xs text-muted-foreground line-clamp-3 mb-3 leading-relaxed">
+      {/* Description */}
+      <p className="text-xs sm:text-sm text-muted-foreground line-clamp-3 mb-3 leading-relaxed">
         {idea.description}
       </p>
 
+      {/* Tags */}
       {idea.tags.length > 0 && (
         <div className="flex flex-wrap gap-1 mb-2">
           {idea.tags.map((tag) => (
@@ -99,6 +131,7 @@ export default function IdeaCard({ idea, onClick }: IdeaCardProps) {
         </div>
       )}
 
+      {/* Tech stack */}
       {idea.techStack.length > 0 && (
         <div className="flex flex-wrap gap-1">
           {idea.techStack.map((tech) => (
@@ -113,43 +146,13 @@ export default function IdeaCard({ idea, onClick }: IdeaCardProps) {
         </div>
       )}
 
+      {/* Footer */}
       <p className="text-[10px] text-muted-foreground/60 mt-3">
         {new Date(idea.createdAt).toLocaleDateString("en-US", {
           month: "short",
           day: "numeric",
         })}
       </p>
-
-      <AlertDialog>
-        <AlertDialogTrigger asChild>
-          <button
-            onClick={(e) => {
-              // To stop the modal from opening
-              e.stopPropagation();
-            }}
-            className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-md hover:bg-destructive/10"
-          >
-            <Trash2 className="w-3.5 h-3.5 text-destructive" />
-          </button>
-        </AlertDialogTrigger>
-        <AlertDialogContent
-          // To stop event from propogating.
-          onClick={(e) => e.stopPropagation()}
-        >
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will permanently delete your idea.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete}>
-              Continue
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 }
