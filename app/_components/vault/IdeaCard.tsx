@@ -1,9 +1,8 @@
-import { Idea } from "@/app/_lib/types";
+"use client";
+
 import { Badge } from "@/components/ui/badge";
 import { Cloud, CloudOff, Loader2, Trash2 } from "lucide-react";
-import { useIdeas } from "../IdeasContext";
 import { toast } from "sonner";
-import { ideasToMarkdown } from "@/app/_lib/ideasToMarkdown";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,7 +14,26 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { motion, Variants, AnimatePresence } from "motion/react";
+
+import { ideasToMarkdown } from "@/app/_lib/ideasToMarkdown";
+import { useIdeas } from "../IdeasContext";
+import { Idea } from "@/app/_lib/types";
 import { updateGithubFile } from "@/app/_lib/updateGithubFile";
+
+const TagsAndTechStackVariants: Variants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.3, ease: "easeInOut", delay: i * 0.1 },
+  }),
+  exit: {
+    opacity: 0,
+    y: -10,
+    transition: { duration: 0.2, ease: "easeInOut" },
+  },
+};
 
 interface IdeaCardProps {
   idea: Idea;
@@ -70,8 +88,8 @@ export default function IdeaCard({ idea, onClick }: IdeaCardProps) {
   }
 
   return (
-    <div
-      className="group relative flex flex-col border w-full p-4 sm:p-5 rounded-xl hover:shadow-md transition"
+    <motion.div
+      className="group relative flex flex-col border w-full p-4 sm:p-5 rounded-xl hover:shadow-md transition cursor-pointer"
       onClick={() => onClick?.(idea)}
     >
       {/* Header */}
@@ -94,18 +112,24 @@ export default function IdeaCard({ idea, onClick }: IdeaCardProps) {
             </AlertDialogTrigger>
 
             <AlertDialogContent onClick={(e) => e.stopPropagation()}>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This will permanently delete your idea.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleDelete}>
-                  Continue
-                </AlertDialogAction>
-              </AlertDialogFooter>
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+              >
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will permanently delete your idea.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDelete}>
+                    Continue
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </motion.div>
             </AlertDialogContent>
           </AlertDialog>
         </div>
@@ -119,30 +143,47 @@ export default function IdeaCard({ idea, onClick }: IdeaCardProps) {
       {/* Tags */}
       {idea.tags.length > 0 && (
         <div className="flex flex-wrap gap-1 mb-2">
-          {idea.tags.map((tag) => (
-            <Badge
-              key={tag}
-              variant="secondary"
-              className="text-[10px] px-1.5 py-0"
-            >
-              {tag}
-            </Badge>
-          ))}
+          <AnimatePresence>
+            {idea.tags.map((tag, i) => (
+              <motion.div
+                key={tag}
+                custom={i}
+                variants={TagsAndTechStackVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+              >
+                <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
+                  {tag}
+                </Badge>
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
       )}
 
       {/* Tech stack */}
       {idea.techStack.length > 0 && (
         <div className="flex flex-wrap gap-1">
-          {idea.techStack.map((tech) => (
-            <Badge
-              key={tech}
-              variant="outline"
-              className="text-[10px] px-1.5 py-0 text-primary/70 border-primary/20"
-            >
-              {tech}
-            </Badge>
-          ))}
+          <AnimatePresence>
+            {idea.techStack.map((tech, i) => (
+              <motion.div
+                key={tech}
+                custom={i}
+                variants={TagsAndTechStackVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+              >
+                <Badge
+                  variant="outline"
+                  className="text-[10px] px-1.5 py-0 text-primary/70 border-primary/20"
+                >
+                  {tech}
+                </Badge>
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
       )}
 
@@ -153,6 +194,6 @@ export default function IdeaCard({ idea, onClick }: IdeaCardProps) {
           day: "numeric",
         })}
       </p>
-    </div>
+    </motion.div>
   );
 }

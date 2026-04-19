@@ -3,11 +3,12 @@
 import { useState } from "react";
 import { useIdeas } from "../IdeasContext";
 
-import { Idea } from "@/app/_lib/types";
 import { Send, Sparkles, ToggleLeft, ToggleRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+
+import { Idea } from "@/app/_lib/types";
 import { ideasToMarkdown } from "@/app/_lib/ideasToMarkdown";
 import { generateSummary } from "@/app/_lib/generateSummary";
 import { updateGithubFile } from "@/app/_lib/updateGithubFile";

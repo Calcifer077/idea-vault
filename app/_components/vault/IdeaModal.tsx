@@ -14,6 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { motion } from "motion/react";
 
 import { Idea } from "@/app/_lib/types";
 import { useIdeas } from "../IdeasContext";
@@ -129,101 +130,107 @@ export default function IdeaModal({ idea, onClose }: IdeaModalProps) {
   return (
     <Dialog open={true} onOpenChange={onClose}>
       <DialogContent className="w-[95%] sm:max-w-lg max-h-[90vh] p-4 sm:p-6 rounded-2xl overflow-y-auto">
-        <DialogHeader className="space-y-1">
-          <DialogTitle>Edit Idea</DialogTitle>
-          <DialogDescription>
-            Make changes to your idea here. Click save when done.
-          </DialogDescription>
-        </DialogHeader>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, ease: "easeInOut" }}
+        >
+          <DialogHeader className="space-y-1">
+            <DialogTitle>Edit Idea</DialogTitle>
+            <DialogDescription>
+              Make changes to your idea here. Click save when done.
+            </DialogDescription>
+          </DialogHeader>
 
-        <div className="space-y-4">
-          {/* Title */}
-          <Input value={title} onChange={(e) => setTitle(e.target.value)} />
+          <div className="space-y-4">
+            {/* Title */}
+            <Input value={title} onChange={(e) => setTitle(e.target.value)} />
 
-          {/* Description */}
-          <Textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className="min-h-25"
-          />
-
-          {/* TAGS */}
-          <div>
-            <p className="text-sm font-medium mb-2">Tags</p>
-
-            {tags.length > 0 && (
-              <div className="flex flex-wrap gap-2 mb-2">
-                {tags.map((tag, i) => (
-                  <Badge
-                    key={i}
-                    variant="secondary"
-                    className="flex items-center gap-1"
-                  >
-                    {tag}
-                    <span
-                      className="cursor-pointer"
-                      onClick={() => handleRemoveTag(i)}
-                    >
-                      ✕
-                    </span>
-                  </Badge>
-                ))}
-              </div>
-            )}
-
-            <Input
-              placeholder="Add tag + Enter"
-              value={tagInput}
-              onChange={(e) => setTagInput(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleAddTag()}
+            {/* Description */}
+            <Textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="min-h-25"
             />
-          </div>
 
-          {/* TECH STACK */}
-          <div>
-            <p className="text-sm font-medium mb-2">Tech Stack</p>
+            {/* TAGS */}
+            <div>
+              <p className="text-sm font-medium mb-2">Tags</p>
 
-            {techStack.length > 0 && (
-              <div className="flex flex-wrap gap-2 mb-2">
-                {techStack.map((tech, i) => (
-                  <Badge
-                    key={i}
-                    variant="outline"
-                    className="flex items-center gap-1 text-primary"
-                  >
-                    {tech}
-                    <span
-                      className="cursor-pointer"
-                      onClick={() => handleRemoveTechStack(i)}
+              {tags.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {tags.map((tag, i) => (
+                    <Badge
+                      key={i}
+                      variant="secondary"
+                      className="flex items-center gap-1"
                     >
-                      ✕
-                    </span>
-                  </Badge>
-                ))}
-              </div>
-            )}
+                      {tag}
+                      <span
+                        className="cursor-pointer"
+                        onClick={() => handleRemoveTag(i)}
+                      >
+                        ✕
+                      </span>
+                    </Badge>
+                  ))}
+                </div>
+              )}
 
-            <Input
-              placeholder="Add tech + Enter"
-              value={techStackInput}
-              onChange={(e) => setTechStackInput(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleAddTechStack()}
-            />
-          </div>
+              <Input
+                placeholder="Add tag + Enter"
+                value={tagInput}
+                onChange={(e) => setTagInput(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleAddTag()}
+              />
+            </div>
 
-          {/* Actions */}
-          <div className="flex flex-col sm:flex-row gap-2 pt-2">
-            <DialogClose asChild>
-              <Button variant="outline" className="w-full sm:w-auto">
-                Cancel
+            {/* TECH STACK */}
+            <div>
+              <p className="text-sm font-medium mb-2">Tech Stack</p>
+
+              {techStack.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {techStack.map((tech, i) => (
+                    <Badge
+                      key={i}
+                      variant="outline"
+                      className="flex items-center gap-1 text-primary"
+                    >
+                      {tech}
+                      <span
+                        className="cursor-pointer"
+                        onClick={() => handleRemoveTechStack(i)}
+                      >
+                        ✕
+                      </span>
+                    </Badge>
+                  ))}
+                </div>
+              )}
+
+              <Input
+                placeholder="Add tech + Enter"
+                value={techStackInput}
+                onChange={(e) => setTechStackInput(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleAddTechStack()}
+              />
+            </div>
+
+            {/* Actions */}
+            <div className="flex flex-col sm:flex-row gap-2 pt-2">
+              <DialogClose asChild>
+                <Button variant="outline" className="w-full sm:w-auto">
+                  Cancel
+                </Button>
+              </DialogClose>
+
+              <Button onClick={handleSave} className="w-full sm:w-auto">
+                Save
               </Button>
-            </DialogClose>
-
-            <Button onClick={handleSave} className="w-full sm:w-auto">
-              Save
-            </Button>
+            </div>
           </div>
-        </div>
+        </motion.div>
       </DialogContent>
     </Dialog>
   );
