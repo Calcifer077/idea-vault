@@ -1,33 +1,31 @@
 import { Command } from "commander";
-import inquirer from "inquirer";
+import rawlist from "@inquirer/rawlist";
 import chalk from "chalk";
 import { loadIdeas, saveIdeas } from "../lib/store";
 
 export const deleteCommand = new Command("delete")
   .description("Delete an idea by ID")
-  .option("-i, --id <id>", "ID of the idea to delete")
-  .action(async (opts: { id: string }) => {
+  .action(async () => {
+    console.log(chalk.dim("Fetching ideas from GitHub..."));
+    const { ideas, sha } = await loadIdeas();
+
+    if (ideas.length === 0) {
+      console.log(chalk.yellow("No ideas found."));
+      return;
+    }
+
+    console.log("Use arrow keys to select an idea to delete:");
+
     try {
-      const answers = await inquirer.prompt([
-        {
-          type: "input",
-          name: "id",
-          message: "ID of the idea to delete:",
-          when: !opts.id,
-          validate: (v) => v.trim() !== "" || "ID is required",
-        },
-      ]);
+      const answer = await rawlist({
+        message: "Select a ID to be deleted:",
+        choices: ideas.map((idea) => ({
+          name: `ID: ${idea.id} - Title: ${idea.title}`,
+          value: idea.id,
+        })),
+      });
 
-      console.log(chalk.dim("Fetching ideas from GitHub..."));
-
-      const { ideas, sha } = await loadIdeas();
-
-      if (ideas.length === 0) {
-        console.log(chalk.yellow("No ideas found."));
-        return;
-      }
-
-      const idToDelete = answers.id.trim();
+      const idToDelete = answer?.trim();
 
       const idea = ideas.find((idea) => idea.id === idToDelete);
 

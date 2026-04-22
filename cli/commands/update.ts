@@ -1,5 +1,6 @@
 import { Command } from "commander";
 import inquirer from "inquirer";
+import rawlist from "@inquirer/rawlist";
 import chalk from "chalk";
 import { loadIdeas, saveIdeas } from "../lib/store";
 import { Idea } from "../../app/_lib/types";
@@ -23,14 +24,24 @@ export const updateCommand = new Command("update")
     }) => {
       console.log("If you don't want to update anything. Just press enter.");
       try {
+        console.log(chalk.dim("Fetching ideas..."));
+        const { ideas, sha } = await loadIdeas();
+
+        if (ideas.length === 0) {
+          console.log(chalk.yellow("No ideas found"));
+          return;
+        }
+
+        console.log("Use arrow keys to select an idea to update.");
+        const idToUpdate = await rawlist({
+          message: "Select an ID to update:",
+          choices: ideas.map((idea) => ({
+            name: `ID: ${idea.id} - Title: ${idea.title}`,
+            value: idea.id,
+          })),
+        });
+
         const answers = await inquirer.prompt([
-          {
-            type: "input",
-            name: "id",
-            message: "ID to be updated: ",
-            when: !opts.id,
-            validate: (v) => v.trim() !== "" || "ID is required",
-          },
           {
             type: "input",
             name: "title",
@@ -62,18 +73,6 @@ export const updateCommand = new Command("update")
             when: !opts.techStack,
           },
         ]);
-
-        console.log(answers);
-
-        const idToUpdate: string = opts.id?.trim() || answers.id?.trim();
-
-        console.log(chalk.dim("Fetching ideas..."));
-        let { ideas, sha } = await loadIdeas();
-
-        if (ideas.length === 0) {
-          console.log(chalk.yellow("No ideas found"));
-          return;
-        }
 
         const idea = ideas.find((idea) => idea.id === idToUpdate);
 
