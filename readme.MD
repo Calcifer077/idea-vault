@@ -23,7 +23,7 @@ Instead of storing ideas in a database, **Idea Vault uses a GitHub repository as
 - Your repo becomes your **portable, version-controlled idea database**
 - You can access and edit ideas via:
   - 🌐 Web App (UI)
-  - 💻 CLI
+  - 💻 CLI [[Check it out]](https://github.com/Calcifer077/idea-vault-cli)
 
 ---
 
@@ -42,7 +42,7 @@ Instead of storing ideas in a database, **Idea Vault uses a GitHub repository as
 - Dark/light mode support (`next-themes`)
 - Markdown rendering with `marked`
 
-### 💻 Have also implmented CLI, you can check it out here: []()
+### 💻 Have also implmented CLI, you can check it out here: [[Github Repo]](https://github.com/Calcifer077/idea-vault-cli)
 
 ---
 
@@ -86,6 +86,7 @@ GEMINI_KEY=GEMINI_API_KEY
 GEMINI_KEY_Name=GEMINI_KEY_NAME
 GEMINI_PROJECT_NAME=GEMINI_PROJECT_NAME
 GEMINI_PROJECT_NUMBER=GEMINI_PROJECT_NUMBER
+NEXT_PUBLIC_PROJECT_PASSWORD=PROJECT_PASSWORD
 ```
 
 ---
