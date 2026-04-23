@@ -74,7 +74,6 @@ function reducer(state: IdeasState, action: Action): IdeasState {
       };
 
     case "set-password":
-      console.log(action);
       return {
         ...state,
         password: action.payload.password,

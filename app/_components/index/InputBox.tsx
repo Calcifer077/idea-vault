@@ -107,8 +107,8 @@ export default function InputBox() {
         position: "top-center",
       });
 
-      // const summaryToUpload = await generateSummary(prompt);
-      const summaryToUpload = "This is a placeholder summary.";
+      const summaryToUpload = await generateSummary(prompt);
+      // const summaryToUpload = "This is a placeholder summary.";
 
       const newIdea: Idea = {
         id: crypto.randomUUID().toString(),
@@ -128,7 +128,7 @@ export default function InputBox() {
         payload: newIdea,
       });
 
-      if (password === process.env.NEXT_PUBLIC_PROJECT_PASSWORD) {
+      if (state.password === process.env.NEXT_PUBLIC_PROJECT_PASSWORD) {
         const ideasString = ideasToMarkdown(updatedIdeas);
 
         toast.loading("Saving idea...", {
@@ -220,7 +220,7 @@ export default function InputBox() {
             onKeyDown={handleKeyDown}
           />
         </div>
-        
+
         {/* Inputs */}
         <div className="flex flex-col sm:flex-row gap-3 px-3 sm:px-4 pb-4">
           <Input
