@@ -27,7 +27,10 @@ export async function updateFile(
   sha: string,
   message?: string,
 ) {
-  const readableDate = new Date(Date.now()).toISOString().replace('T', ' ').slice(0, 19);
+  const readableDate = new Date(Date.now())
+    .toISOString()
+    .replace("T", " ")
+    .slice(0, 19);
   const finalMessage = message || `Update via Next.js app - ${readableDate}`;
 
   const encodedContent = Buffer.from(newContent).toString("base64");
@@ -51,4 +54,23 @@ export async function updateFile(
 
   if (!res.ok) throw new Error("Failed to update file");
   return res.json();
+}
+
+export async function getTwentyFourCommitHistory() {
+  const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+
+  const url = `${GITHUB_API}/repos/${process.env.GITHUB_OWNER}/${process.env.GITHUB_REPO}/commits?since=${since}&per_page=100`;
+
+  const res = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
+      Accept: "application/vnd.github+json",
+    },
+  });
+
+  const data = await res.json();
+  // just for testing
+  // console.log("Commits in last 24 hours:", data.length);
+
+  return data.length;
 }
