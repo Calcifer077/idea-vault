@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useIdeas } from "../IdeasContext";
 
-import { Send, Sparkles, ToggleLeft, ToggleRight } from "lucide-react";
+import { Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -16,13 +16,31 @@ import { updateGithubFile } from "@/app/_lib/updateGithubFile";
 export default function InputBox() {
   const { state, dispatch } = useIdeas();
 
-  const [markdownSupport, setMarkdownSupport] = useState(false);
+  const [password, setPassword] = useState("");
+
   const [idea, setIdea] = useState("");
   const [tags, setTags] = useState("");
   const [techStack, setTechStack] = useState("");
 
   const [error, setError] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+
+  // set testing password
+  function handleSetPassword() {
+    dispatch({ type: "set-password", payload: { password } });
+
+    toast.success("Password set successfully", {
+      position: "top-center",
+    });
+
+    setPassword("");
+  }
+
+  function handleKeyDown(event: React.KeyboardEvent) {
+    if (event.key === "Enter" && event.ctrlKey) {
+      handleSave();
+    }
+  }
 
   async function handleSave() {
     const toastId = "save-idea";
@@ -89,7 +107,8 @@ export default function InputBox() {
         position: "top-center",
       });
 
-      const summaryToUpload = await generateSummary(prompt);
+      // const summaryToUpload = await generateSummary(prompt);
+      const summaryToUpload = "This is a placeholder summary.";
 
       const newIdea: Idea = {
         id: crypto.randomUUID().toString(),
@@ -102,19 +121,23 @@ export default function InputBox() {
         createdAt: new Date().toISOString(),
       };
 
-      const updatedIdeas = [...state, newIdea];
+      const updatedIdeas = [...state.ideas, newIdea];
 
       dispatch({
         type: "add",
         payload: newIdea,
       });
 
-      const ideasString = ideasToMarkdown(updatedIdeas);
+      if (password === process.env.NEXT_PUBLIC_PROJECT_PASSWORD) {
+        const ideasString = ideasToMarkdown(updatedIdeas);
 
-      toast.loading("Saving idea...", { id: toastId, position: "top-center" });
+        toast.loading("Saving idea...", {
+          id: toastId,
+          position: "top-center",
+        });
 
-      await updateGithubFile(ideasString);
-
+        await updateGithubFile(ideasString);
+      }
       resetState();
 
       setIsSaving(false);
@@ -142,8 +165,36 @@ export default function InputBox() {
   }
 
   return (
-    <div
-      className={`
+    <div className="flex flex-col items-center justify-center w-full px-4">
+      <div className="relative w-full max-w-2xl mb-6">
+        <Input
+          type="password"
+          placeholder="Enter password... (Leave empty if you are just testing)"
+          className="w-full pr-24 bg-card text-xs sm:text-base
+               focus-visible:ring-1 focus-visible:ring-primary focus-visible:ring-inset"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+
+        <button
+          type="button"
+          onClick={handleSetPassword}
+          disabled={!password.trim()}
+          className="
+      sm:absolute sm:right-0 sm:top-1/2 sm:-translate-y-1/2
+      h-8 px-3 text-xs sm:text-sm leading-none
+
+      bg-primary text-primary-foreground rounded-md
+      transition-all transition-duration-300
+
+      focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed active:translate-y-[calc(-50%+2px)]
+    "
+        >
+          Set Password
+        </button>
+      </div>
+      <div
+        className={`
     w-full max-w-2xl mx-auto rounded-xl border border-border bg-card
     transition-all duration-300
 
@@ -154,75 +205,53 @@ export default function InputBox() {
     
     ${error ? "shadow-[0_0_20px_rgba(239,68,68,0.35),0_0_50px_rgba(220,38,38,0.2)] border-destructive" : ""}
   `}
-    >
-      {/* Textarea */}
-      <div className="p-3 sm:p-4">
-        <textarea
-          placeholder="Type your idea... (First line will be title)"
-          className="w-full min-h-30 sm:min-h-35 bg-transparent border-none focus:ring-0 outline-none resize-none text-sm sm:text-base placeholder:text-muted-foreground"
-          value={idea}
-          onChange={(e) => {
-            setIdea(e.target.value);
-            setError(false);
-          }}
-          disabled={isSaving}
-        />
-      </div>
+      >
+        {/* Textarea */}
+        <div className="p-3 sm:p-4">
+          <textarea
+            placeholder="Type your idea... (First line will be title)"
+            className="w-full min-h-30 sm:min-h-35 bg-transparent border-none focus:ring-0 outline-none resize-none text-xs sm:text-base placeholder:text-muted-foreground"
+            value={idea}
+            onChange={(e) => {
+              setIdea(e.target.value);
+              setError(false);
+            }}
+            disabled={isSaving}
+            onKeyDown={handleKeyDown}
+          />
+        </div>
+        
+        {/* Inputs */}
+        <div className="flex flex-col sm:flex-row gap-3 px-3 sm:px-4 pb-4">
+          <Input
+            placeholder="Tags (comma separated)"
+            className="w-full bg-background/50 border-border focus-visible:ring-primary focus-visible:ring-1 text-xs sm:text-base"
+            value={tags}
+            onChange={(e) => {
+              setTags(e.target.value);
+              setError(false);
+            }}
+            disabled={isSaving}
+            onKeyDown={handleKeyDown}
+          />
 
-      {/* Inputs */}
-      <div className="flex flex-col sm:flex-row gap-3 px-3 sm:px-4 pb-4">
-        <Input
-          placeholder="Tags (comma separated)"
-          className="w-full bg-background/50 border-border focus-visible:ring-primary focus-visible:ring-1"
-          value={tags}
-          onChange={(e) => {
-            setTags(e.target.value);
-            setError(false);
-          }}
-          disabled={isSaving}
-        />
+          <Input
+            placeholder="Tech Stack (comma separated)"
+            className="w-full bg-background/50 border-border focus-visible:ring-primary focus-visible:ring-1 text-xs sm:text-base"
+            value={techStack}
+            onChange={(e) => {
+              setTechStack(e.target.value);
+              setError(false);
+            }}
+            disabled={isSaving}
+            onKeyDown={handleKeyDown}
+          />
+        </div>
 
-        <Input
-          placeholder="Tech Stack (comma separated)"
-          className="w-full bg-background/50 border-border focus-visible:ring-primary focus-visible:ring-1"
-          value={techStack}
-          onChange={(e) => {
-            setTechStack(e.target.value);
-            setError(false);
-          }}
-          disabled={isSaving}
-        />
-      </div>
-
-      {/* Action Bar */}
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 p-3 border-t border-border bg-muted/30 rounded-b-xl">
-        {/* Toggle */}
-        <Button
-          variant="ghost"
-          size="sm"
-          className="flex items-center justify-center sm:justify-start gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors w-full sm:w-auto"
-          onClick={() => setMarkdownSupport(!markdownSupport)}
-        >
-          {markdownSupport ? (
-            <ToggleRight className="text-primary" />
-          ) : (
-            <ToggleLeft />
-          )}
-          Markdown Support
-        </Button>
-
-        {/* Buttons */}
-        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+        {/* Action Bar */}
+        <div className="flex justify-end items-center p-3 border-t border-border bg-muted/30 rounded-b-xl">
           <Button
-            variant="secondary"
-            className="w-full sm:w-auto gap-2 shadow-sm"
-          >
-            <Sparkles size={16} className="text-primary" />
-            Ai Summary
-          </Button>
-
-          <Button
-            className="w-full sm:w-auto bg-primary text-primary-foreground hover:opacity-90 gap-2"
+            className="w-full sm:w-[35%] bg-primary text-primary-foreground hover:opacity-90 gap-2"
             onClick={handleSave}
             disabled={isSaving}
           >

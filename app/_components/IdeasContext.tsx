@@ -17,11 +17,17 @@ type Action =
         techStack: string[];
       };
     }
-  | { type: "set"; payload: Idea[] };
+  | { type: "set"; payload: Idea[] }
+  | { type: "set-password"; payload: { password: string } };
 
 // 2. Define context type
+type IdeasState = {
+  ideas: Idea[];
+  password?: string;
+};
+
 type IdeasContextType = {
-  state: Idea[];
+  state: IdeasState;
   dispatch: React.Dispatch<Action>;
 };
 
@@ -31,37 +37,53 @@ type IdeasContextType = {
 const IdeasContext = createContext<IdeasContextType | undefined>(undefined);
 
 // 5. Reducer
-function reducer(state: Idea[], action: Action): Idea[] {
+function reducer(state: IdeasState, action: Action): IdeasState {
   switch (action.type) {
     case "set":
-      return action.payload;
+      return { ...state, ideas: action.payload };
 
     case "add":
-      return [...state, { ...action.payload, syncStatus: "synced" }];
+      return {
+        ...state,
+        ideas: [...state.ideas, { ...action.payload, syncStatus: "synced" }],
+      };
 
     case "remove":
-      return state.filter((idea) => idea.id !== action.payload);
+      return {
+        ...state,
+        ideas: state.ideas.filter((idea) => idea.id !== action.payload),
+      };
 
     case "update":
       const { id, title, description, tags, techStack } = action.payload;
-      const newState: Idea[] = [];
 
-      for (const idea of state) {
-        if (idea.id === id) {
-          const updatedIdea = { title, description, tags, techStack };
-          newState.push({ ...idea, ...updatedIdea, syncStatus: "pending" });
-        } else {
-          newState.push({ ...idea });
-        }
-      }
+      return {
+        ...state,
+        ideas: state.ideas.map((idea) =>
+          idea.id === id
+            ? {
+                ...idea,
+                title,
+                description,
+                tags,
+                techStack,
+                syncStatus: "pending",
+              }
+            : idea,
+        ),
+      };
 
-      return newState;
+    case "set-password":
+      console.log(action);
+      return {
+        ...state,
+        password: action.payload.password,
+      };
 
     default:
       return state;
   }
 }
-
 // 6. Provider
 function IdeasContextProvider({
   children,
@@ -70,7 +92,10 @@ function IdeasContextProvider({
   children: ReactNode;
   initialIdeas: Idea[];
 }) {
-  const [state, dispatch] = useReducer(reducer, initialIdeas);
+  const [state, dispatch] = useReducer(reducer, {
+    ideas: initialIdeas,
+    password: undefined,
+  });
 
   return (
     <IdeasContext.Provider value={{ state, dispatch }}>

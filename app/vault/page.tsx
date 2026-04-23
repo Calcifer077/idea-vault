@@ -7,6 +7,8 @@ import SearchIdeas from "../_components/vault/SearchIdeas";
 export default function Page() {
   const { state } = useIdeas();
 
+  const ideas = state.ideas;
+
   return (
     <div className="w-full min-h-screen px-6 sm:px-8 lg:px-10">
       {/* Top border */}
@@ -20,17 +22,17 @@ export default function Page() {
             Vault
           </h1>
           <span className="text-sm text-muted-foreground">
-            {state.length} ideas stored
+            {ideas.length} ideas stored
           </span>
         </div>
 
         {/* Right section (future search/filter) */}
-        <div className="w-full sm:w-64">
+        {/* <div className="w-full sm:w-64">
           <SearchIdeas />
-        </div>
+        </div> */}
       </div>
 
-      <IdeaGroup ideas={state} />
+      <IdeaGroup ideas={ideas} />
     </div>
   );
 }

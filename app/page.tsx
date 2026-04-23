@@ -43,7 +43,7 @@ export default function Home() {
       <div className="w-full border-t border-border" />
 
       {/* Hero */}
-      <section className="py-12 sm:py-16 lg:py-20 text-center px-4">
+      <section className="py-6 sm:py-8 lg:py-10 text-center px-4">
         <div className="max-w-4xl mx-auto">
           <motion.h1
             variants={itemVariants}
@@ -71,7 +71,7 @@ export default function Home() {
         variants={itemVariants}
         className="pt-4 text-xs text-center mb-10 px-4"
       >
-        Press <Kbd>Ctrl</Kbd> + <Kbd>Enter</Kbd> to save
+        Press <Kbd>Ctrl</Kbd> + <Kbd>Enter</Kbd> to save while in input box.
       </motion.p>
     </motion.div>
   );

@@ -56,7 +56,7 @@ export default function IdeaCard({ idea, onClick }: IdeaCardProps) {
     toast.loading("Deleting...", { id: toastId, position: "top-center" });
 
     try {
-      const updatedState = state.filter((i) => i.id !== idea.id);
+      const updatedState = state?.ideas.filter((i) => i.id !== idea.id);
 
       dispatch({
         type: "remove",
@@ -68,9 +68,10 @@ export default function IdeaCard({ idea, onClick }: IdeaCardProps) {
         position: "top-center",
       });
 
-      const ideasString = ideasToMarkdown(updatedState);
-
-      await updateGithubFile(ideasString);
+      if (state.password === process.env.NEXT_PUBLIC_PROJECT_PASSWORD) {
+        const ideasString = ideasToMarkdown(updatedState);
+        await updateGithubFile(ideasString);
+      }
 
       toast.success("Idea deleted successfully", {
         id: toastId,

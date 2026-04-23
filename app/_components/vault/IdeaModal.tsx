@@ -84,7 +84,7 @@ export default function IdeaModal({ idea, onClose }: IdeaModalProps) {
     try {
       const updatedIdeas: Idea[] = [];
 
-      for (const oldIdea of state) {
+      for (const oldIdea of state.ideas) {
         if (oldIdea.id === idea.id) {
           const updatedIdea = { title, description, tags, techStack };
           updatedIdeas.push({ ...idea, ...updatedIdea, syncStatus: "pending" });
@@ -106,10 +106,11 @@ export default function IdeaModal({ idea, onClose }: IdeaModalProps) {
 
       toast.loading("Saving idea...", { id: toastId, position: "top-center" });
 
-      const ideasString = ideasToMarkdown(updatedIdeas);
+      if (state.password === process.env.NEXT_PUBLIC_PROJECT_PASSWORD) {
+        const ideasString = ideasToMarkdown(updatedIdeas);
 
-      await updateGithubFile(ideasString);
-
+        await updateGithubFile(ideasString);
+      }
       toast.success("Idea updated successfully", {
         id: toastId,
         position: "top-center",

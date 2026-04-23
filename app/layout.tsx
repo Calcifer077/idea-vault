@@ -35,13 +35,13 @@ export default async function RootLayout({
         suppressHydrationWarning
         className="min-h-screen w-screen flex flex-col bg-background text-foreground transition-colors overflow-x-hidden"
       >
-        <Navbar />
         <IdeasContextProvider initialIdeas={ideas}>
+          <Navbar />
           <main className="flex-1">{children}</main>
           <Toaster />
+          <Footer />
         </IdeasContextProvider>
         {/* <div className="flex-1" /> pushes footer down */}
-        <Footer />
       </body>
     </html>
   );
